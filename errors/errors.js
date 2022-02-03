@@ -1,7 +1,7 @@
 exports.twilioError = (err, req, res, next) => {
   console.log(err.code);
   if (err.code === 21211) {
-    throw new Error(err.moreInfo);
+    res.status(400).send("invalid phone number");
   }
 
   next();
