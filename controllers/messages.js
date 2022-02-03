@@ -1,18 +1,17 @@
 const client = require("../twilio/client");
 const { TWILIO_NUM } = process.env;
 
-exports.sendMessage = async (req, res) => {
-  const { number, message: testMessage } = req.body;
-
-  console.log(number, testMessage, TWILIO_NUM);
-
-  const message = await client.messages.create({
-    from: `whatsapp:${TWILIO_NUM}`,
-    body: testMessage,
-    to: `whatsapp:${number}`,
-  });
-
-  res.send(message);
+exports.sendMessage = async ({ body }, res, next) => {
+  try {
+    const message = await client.messages.create({
+      from: `whatsapp:${TWILIO_NUM}`,
+      body: body.message,
+      to: `whatsapp:${body.number}`,
+    });
+    res.send(message);
+  } catch (err) {
+    next(err);
+  }
 };
 
 const MessagingResponse = require("twilio").twiml.MessagingResponse;
