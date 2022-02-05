@@ -1,33 +1,23 @@
-const client = require("../twilio/client");
-const { TWILIO_NUM } = process.env;
+const { sendMessage, fetchMessages } = require("../models/messages");
 
-exports.sendMessage = async ({ body }, res, next) => {
+exports.postMessage = async (req, res, next) => {
   try {
-    const message = await client.messages.create({
-      from: `whatsapp:${TWILIO_NUM}`,
-      body: body.message,
-      to: `whatsapp:${body.number}`,
-    });
-    res.send(message);
+    const message = await sendMessage(req.body);
+    res.status(200).send(message);
   } catch (err) {
     next(err);
   }
 };
 
-const MessagingResponse = require("twilio").twiml.MessagingResponse;
-
-exports.receiveMessage = async (req, res) => {
-  console.log("message received");
-  const twiml = new MessagingResponse();
-
-  twiml.message("Automated response test");
-
-  res.writeHead(200, { "Content-Type": "text/xml" });
-  res.end(
-    `<?xml version="1.0" encoding="UTF-8"?><Response><Message>Automated response test with xml</Message></Response>`
-  );
+exports.getMessages = async (req, res, next) => {
+  try {
+    const messages = await fetchMessages();
+    res.status(200).send({ messages });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.receiveCallback = async (req, res) => {
-  console.log(req.body);
+exports.receiveMessage = async (req, res, next) => {
+  console.log(req.body, "<<");
 };
