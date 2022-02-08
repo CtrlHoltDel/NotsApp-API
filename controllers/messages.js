@@ -1,8 +1,10 @@
 const { addMessage } = require("../models/messages");
-const { addUser } = require("../models/user");
+const { Message } = require("../models/schema");
 const client = require("../twilio/config");
 
 exports.sendMessage = async (req, res, next) => {
+  console.log(req.body);
+
   try {
     const { message, number } = req.body;
 
@@ -18,27 +20,23 @@ exports.sendMessage = async (req, res, next) => {
 
     res.sendStatus(201);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
 
-// exports.receiveMessage = async (req, res, next) => {
-//   try {
-//     const {
-//       From,
-//       To,
-//       Body,
-//       MessageSid,
-//       ProfileName,
-//       MediaContentType0,
-//       MediaUrl0,
-//     } = req.body;
+exports.getMessages = async (req, res, next) => {
+  const { number } = req.query;
 
-//     await addUser(From, ProfileName);
-//     await addMessage(From, To, Body, MessageSid, MediaContentType0, MediaUrl0);
+  try {
+    const messages = await Message.find({
+      $or: [{ from: `whatsapp:+${number}` }, { to: `whatsapp:+${number}` }],
+    })
+      .sort({ timeStamp: -1 })
+      .limit(20);
 
-//     res.sendStatus(201);
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+    res.send({ messages });
+  } catch (err) {
+    console.log(err);
+  }
+};
