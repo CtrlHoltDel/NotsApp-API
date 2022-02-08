@@ -1,21 +1,14 @@
-const client = require("../twilio/client");
-const { TWILIO_NUM } = process.env;
+const { Message } = require("./schema");
 
-exports.sendMessage = async ({ message, number }) => {
-  const data = await client.messages.create({
-    from: `whatsapp:${TWILIO_NUM}`,
-    body: message,
-    to: `whatsapp:${number}`,
-    statusCallback: "https://0645-88-97-43-131.ngrok.io/cb-status",
+exports.addMessage = async (from, to, body, sid, type = "text") => {
+  const messageInstance = new Message({
+    from,
+    to,
+    type,
+    body,
+    sid,
+    timeStamp: Date.now(),
   });
 
-  return data;
-};
-
-exports.fetchMessages = async () => {
-  const result = await client.messages.list({ limit: 20 });
-
-  console.log(result);
-
-  return result;
+  await messageInstance.save();
 };

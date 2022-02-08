@@ -1,55 +1,69 @@
+require("dotenv").config({ path: `${__dirname}/.env` });
+
 const express = require("express");
-
-require("dotenv").config({ path: `${__dirname}/.env.twilio` });
-
 const app = express();
-const server = require("http").createServer(app);
-
-const WebSocket = require("ws");
-const wss = new WebSocket.Server({ server: server });
-
-const { twilioError } = require("./errors/errors");
-
-const {
-  postMessage,
-  receiveMessage,
-  getMessages,
-} = require("./controllers/messages");
-const { getContacts } = require("./controllers/contacts");
-const client = require("./twilio/client");
-
+const server = require("http").Server(app);
 const cors = require("cors");
-const bodyParser = require("body-parser");
+const { urlencoded } = require("body-parser");
 
-app.use(bodyParser.urlencoded({ extended: false }));
+const db = require("./mongoDB/config");
+
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
+const { twilioError, serverError } = require("./errors/errors");
+const usersRouter = require("./routers/users");
+const messagesRouter = require("./routers/messages");
+const { addUser } = require("./models/user");
+const { addMessage } = require("./models/messages");
+
 app.use(cors());
+app.use(urlencoded({ extended: false }));
 app.use(express.json());
 
-wss.on("connection", (ws) => {
-  console.log(Object.keys(ws));
-  console.log("a client connected");
+const io = require("socket.io")(server, { cors: { origin: "*" } });
+
+io.on("connection", (socket) => {
+  console.log(`socket: ${socket.id} - connected`);
 });
 
-app.get("/", (req, res) => {
-  res.status(200).send("server up");
+app.get("/", async (req, res, next) => {
+  res.send("connected");
 });
 
-app.post("/send-message", postMessage);
-app.post("/receive-message", receiveMessage);
-app.get("/messages", getMessages);
-app.get("/contacts", getContacts);
-app.post("/cb-status", (req, res, next) => {
-  const { body } = req;
-});
+app.use("/users", usersRouter);
+app.use("/messages", messagesRouter);
 
-app.get("/messages/del", async (req, res, next) => {
-  const messages = await client.messages.list();
+app.post("/messages/receive-message", async (req, res, next) => {
+  try {
+    console.log(Object.keys(req.body));
+    const {
+      From,
+      To,
+      Body,
+      MessageSid,
+      ProfileName,
+      MediaContentType0,
+      MediaUrl0,
+    } = req.body;
 
-  messages.forEach((message) => {
-    client.messages(message.sid).remove();
-  });
+    console.log(From);
+
+    await addUser(From, ProfileName, Body);
+    await addMessage(From, To, Body, MessageSid, MediaContentType0, MediaUrl0);
+
+    io.emit("live-message", {
+      From,
+      ProfileName,
+      Body,
+      MediaContentType0,
+      MediaUrl0,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use(twilioError);
+app.use(serverError);
 
 module.exports = server;

@@ -1,23 +1,44 @@
-const { sendMessage, fetchMessages } = require("../models/messages");
+const { addMessage } = require("../models/messages");
+const { addUser } = require("../models/user");
+const client = require("../twilio/config");
 
-exports.postMessage = async (req, res, next) => {
+exports.sendMessage = async (req, res, next) => {
   try {
-    const message = await sendMessage(req.body);
-    res.status(200).send(message);
+    const { message, number } = req.body;
+
+    const data = await client.messages.create({
+      body: message,
+      to: `whatsapp:${number}`,
+      from: "whatsapp:+14155238886",
+    });
+
+    const { from, to, body, sid } = data;
+
+    await addMessage(from, to, body, sid);
+
+    res.sendStatus(201);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getMessages = async (req, res, next) => {
-  try {
-    const messages = await fetchMessages();
-    res.status(200).send({ messages });
-  } catch (err) {
-    next(err);
-  }
-};
+// exports.receiveMessage = async (req, res, next) => {
+//   try {
+//     const {
+//       From,
+//       To,
+//       Body,
+//       MessageSid,
+//       ProfileName,
+//       MediaContentType0,
+//       MediaUrl0,
+//     } = req.body;
 
-exports.receiveMessage = async (req, res, next) => {
-  console.log(req.body, "<<");
-};
+//     await addUser(From, ProfileName);
+//     await addMessage(From, To, Body, MessageSid, MediaContentType0, MediaUrl0);
+
+//     res.sendStatus(201);
+//   } catch (err) {
+//     next(err);
+//   }
+// };

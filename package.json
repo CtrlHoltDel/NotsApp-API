@@ -1,22 +1,22 @@
 {
-  "name": "nots-app",
+  "name": "twilio",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node listen.js"
+    "start:dev": "nodemon listen.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.25.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
-    "dotenv": "^15.0.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.2",
-    "twilio": "^3.73.1",
-    "ws": "^8.4.2"
+    "mongoose": "^6.2.0",
+    "socket.io": "^4.4.1",
+    "twilio": "^3.73.1"
   }
 }
