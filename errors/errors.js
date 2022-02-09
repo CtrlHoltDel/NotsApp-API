@@ -6,6 +6,6 @@ exports.twilioError = (err, req, res, next) => {
 };
 
 exports.serverError = (err, req, res, next) => {
-  //   console.log(err, "<< Uncaught err");
+  console.log(err, "<< Uncaught err");
   res.status(500);
 };

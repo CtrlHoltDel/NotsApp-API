@@ -3,24 +3,20 @@ const { Message } = require("../models/schema");
 const client = require("../twilio/config");
 
 exports.sendMessage = async (req, res, next) => {
-  console.log(req.body);
-
   try {
     const { message, number } = req.body;
 
     const data = await client.messages.create({
       body: message,
-      to: `whatsapp:${number}`,
+      to: number,
       from: "whatsapp:+14155238886",
     });
 
-    const { from, to, body, sid } = data;
+    const timeStamp = Date.now();
 
-    await addMessage(from, to, body, sid);
-
-    res.sendStatus(201);
+    await addMessage({ ...data, timeStamp });
+    res.status(201).send({ data, timeStamp });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
@@ -37,6 +33,6 @@ exports.getMessages = async (req, res, next) => {
 
     res.send({ messages });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

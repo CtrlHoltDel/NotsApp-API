@@ -22,10 +22,6 @@ app.use(express.json());
 
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 
-io.on("connection", (socket) => {
-  console.log(`socket: ${socket.id} - connected`);
-});
-
 app.get("/", async (req, res, next) => {
   res.send("connected");
 });
@@ -35,28 +31,24 @@ app.use("/messages", messagesRouter);
 
 app.post("/messages/receive-message", async (req, res, next) => {
   try {
-    console.log(Object.keys(req.body));
-    const {
-      From,
-      To,
-      Body,
-      MessageSid,
-      ProfileName,
-      MediaContentType0,
-      MediaUrl0,
-    } = req.body;
+    const { From, To, Body, MessageSid, ProfileName } = req.body;
 
-    console.log(From);
-
-    await addUser(From, ProfileName, Body);
-    await addMessage(From, To, Body, MessageSid, MediaContentType0, MediaUrl0);
+    const timeStamp = Date.now();
+    await addUser(From, ProfileName, Body, timeStamp);
+    await addMessage({
+      from: From,
+      to: To,
+      body: Body,
+      sid: MessageSid,
+      timeStamp,
+    });
 
     io.emit("live-message", {
-      From,
-      ProfileName,
-      Body,
-      MediaContentType0,
-      MediaUrl0,
+      from: From,
+      profile_name: ProfileName,
+      body: Body,
+      sid: MessageSid,
+      timeStamp,
     });
   } catch (err) {
     next(err);

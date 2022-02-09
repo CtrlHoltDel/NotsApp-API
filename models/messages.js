@@ -1,14 +1,9 @@
 const { Message } = require("./schema");
 
-exports.addMessage = async (from, to, body, sid, type = "text") => {
-  const messageInstance = new Message({
-    from,
-    to,
-    type,
-    body,
-    sid,
-    timeStamp: Date.now(),
-  });
+exports.addMessage = async (message) => {
+  const { from, to, body, sid, timeStamp } = message;
+
+  const messageInstance = new Message({ from, to, body, sid, timeStamp });
 
   await messageInstance.save();
 };

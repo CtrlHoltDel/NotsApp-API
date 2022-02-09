@@ -6,16 +6,15 @@ const UserSchema = new Schema({
   profile_name: { type: String, required: true },
   number: { type: String, required: true },
   recent_message: { type: String },
+  timeStamp: { type: Date },
 });
 
 const MessageSchema = new Schema({
   from: { type: String, required: true },
   to: { type: String, required: true },
-  type: { type: String, required: true },
   body: { type: String },
   sid: { type: String, required: true },
-  media: { type: String },
-  timeStamp: { type: Date },
+  timeStamp: { type: Date, required: true },
 });
 
 exports.User = mongoose.model("user", UserSchema);
