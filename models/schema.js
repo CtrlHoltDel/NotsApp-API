@@ -15,6 +15,7 @@ const MessageSchema = new Schema({
   body: { type: String },
   sid: { type: String, required: true },
   timeStamp: { type: Date, required: true },
+  message_status: { type: String },
 });
 
 exports.User = mongoose.model("user", UserSchema);

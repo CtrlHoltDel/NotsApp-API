@@ -13,9 +13,9 @@ exports.sendMessage = async (req, res, next) => {
     });
 
     const timeStamp = Date.now();
+    await addMessage({ ...data, timeStamp, message_status: "sending" });
 
-    await addMessage({ ...data, timeStamp });
-    res.status(201).send({ data, timeStamp });
+    res.status(201).send({ data, timeStamp, message_status: "sending" });
   } catch (err) {
     next(err);
   }
@@ -29,7 +29,7 @@ exports.getMessages = async (req, res, next) => {
       $or: [{ from: `whatsapp:+${number}` }, { to: `whatsapp:+${number}` }],
     })
       .sort({ timeStamp: -1 })
-      .limit(20);
+      .limit(40);
 
     res.send({ messages });
   } catch (err) {

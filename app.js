@@ -15,6 +15,8 @@ const usersRouter = require("./routers/users");
 const messagesRouter = require("./routers/messages");
 const { addUser } = require("./models/user");
 const { addMessage } = require("./models/messages");
+const client = require("./twilio/config");
+const { Message } = require("./models/schema");
 
 app.use(cors());
 app.use(urlencoded({ extended: false }));
@@ -31,24 +33,46 @@ app.use("/messages", messagesRouter);
 
 app.post("/messages/receive-message", async (req, res, next) => {
   try {
-    const { From, To, Body, MessageSid, ProfileName } = req.body;
+    const {
+      From: from,
+      To: to,
+      Body: body,
+      MessageSid: sid,
+      ProfileName: profile_name,
+    } = req.body;
 
     const timeStamp = Date.now();
-    await addUser(From, ProfileName, Body, timeStamp);
+    await addUser(from, profile_name, body, timeStamp);
     await addMessage({
-      from: From,
-      to: To,
-      body: Body,
-      sid: MessageSid,
+      from,
+      to,
+      body,
+      sid,
       timeStamp,
     });
 
     io.emit("live-message", {
-      from: From,
-      profile_name: ProfileName,
-      body: Body,
-      sid: MessageSid,
+      from,
+      profile_name,
+      body,
+      sid,
       timeStamp,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/messages/receive-update", async (req, res, next) => {
+  try {
+    const { MessageSid: sid, To: to, MessageStatus: message_status } = req.body;
+
+    await Message.updateOne({ sid }, { message_status });
+
+    io.emit("message-update", {
+      sid,
+      to,
+      message_status,
     });
   } catch (err) {
     next(err);
