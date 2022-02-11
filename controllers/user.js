@@ -6,6 +6,7 @@ exports.getUsers = async (req, res, next) => {
     res.send({ users });
   } catch (err) {
     console.log(err);
+    next(err);
   }
 };
 
@@ -15,8 +16,19 @@ exports.postUser = async (req, res, next) => {
 
     await userInstance.save();
 
-    res.send(userInstance);
+    res.status(201).send(userInstance);
   } catch (err) {
-    res.send(201);
+    console.log(err);
+    next(err);
+  }
+};
+
+exports.delUser = async (req, res, next) => {
+  try {
+    await User.deleteOne({ number: req.body.number });
+    res.status(203);
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 };
