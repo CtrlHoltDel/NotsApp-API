@@ -55,8 +55,6 @@ app.post("/messages/receive-message", async (req, res, next) => {
       media_url,
     });
 
-    console.log("message received");
-
     io.emit("live-message", {
       from,
       profile_name,
@@ -67,14 +65,11 @@ app.post("/messages/receive-message", async (req, res, next) => {
       media_url,
     });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 });
 
 app.post("/messages/receive-update", async (req, res, next) => {
-  console.log("update received");
-
   try {
     const { MessageSid: sid, To: to, MessageStatus: message_status } = req.body;
 

@@ -3,11 +3,9 @@ const { Message, User } = require("./schema");
 exports.addMessage = async (message) => {
   const messageInstance = new Message(message);
 
-  const { to, body, timeStamp } = message;
+  const { to, body, timeStamp, media_type } = message;
 
   await messageInstance.save();
-
-  //If there's no body - preview media type instead.
 
   await User.updateOne(
     { number: to },
