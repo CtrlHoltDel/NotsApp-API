@@ -26,7 +26,7 @@ exports.postUser = async (req, res, next) => {
 exports.delUser = async (req, res, next) => {
   try {
     await User.deleteOne({ number: req.body.number });
-    res.status(203);
+    res.sendStatus(201);
   } catch (err) {
     console.log(err);
     next(err);

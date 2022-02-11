@@ -63,6 +63,8 @@ app.post("/messages/receive-message", async (req, res, next) => {
       media_type,
       media_url,
     });
+
+    res.sendStatus(202);
   } catch (err) {
     next(err);
   }
@@ -72,11 +74,7 @@ app.post("/messages/receive-update", async (req, res, next) => {
   try {
     const { MessageSid: sid, To: to, MessageStatus: message_status } = req.body;
 
-    console.log(req.body);
-
     await Message.updateOne({ sid }, { message_status });
-
-    console.log("pre - emit");
 
     io.emit("message-update", {
       sid,
@@ -84,7 +82,7 @@ app.post("/messages/receive-update", async (req, res, next) => {
       message_status,
     });
 
-    console.log(`should have updated to ${message_status}`);
+    res.sendStatus(202);
   } catch (err) {
     next(err);
   }
