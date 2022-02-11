@@ -16,6 +16,8 @@ const MessageSchema = new Schema({
   sid: { type: String, required: true },
   timeStamp: { type: Date, required: true },
   message_status: { type: String },
+  media_type: { type: String },
+  media_url: { type: String },
 });
 
 exports.User = mongoose.model("user", UserSchema);

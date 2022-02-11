@@ -1,17 +1,16 @@
 const { Message, User } = require("./schema");
 
 exports.addMessage = async (message) => {
-  const { from, to, body, sid, timeStamp, message_status } = message;
+  const messageInstance = new Message(message);
 
-  const messageInstance = new Message({
-    from,
-    to,
-    body,
-    sid,
-    timeStamp,
-    message_status,
-  });
+  const { to, body, timeStamp } = message;
 
   await messageInstance.save();
-  await User.updateOne({ number: to }, { recent_message: body, timeStamp });
+
+  //If there's no body - preview media type instead.
+
+  await User.updateOne(
+    { number: to },
+    { recent_message: !body ? media_type : body, timeStamp }
+  );
 };

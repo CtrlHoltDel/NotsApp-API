@@ -39,6 +39,8 @@ app.post("/messages/receive-message", async (req, res, next) => {
       Body: body,
       MessageSid: sid,
       ProfileName: profile_name,
+      MediaContentType0: media_type,
+      MediaUrl0: media_url,
     } = req.body;
 
     const timeStamp = Date.now();
@@ -49,7 +51,11 @@ app.post("/messages/receive-message", async (req, res, next) => {
       body,
       sid,
       timeStamp,
+      media_type,
+      media_url,
     });
+
+    console.log("message received");
 
     io.emit("live-message", {
       from,
@@ -57,13 +63,18 @@ app.post("/messages/receive-message", async (req, res, next) => {
       body,
       sid,
       timeStamp,
+      media_type,
+      media_url,
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 });
 
 app.post("/messages/receive-update", async (req, res, next) => {
+  console.log("update received");
+
   try {
     const { MessageSid: sid, To: to, MessageStatus: message_status } = req.body;
 
