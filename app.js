@@ -15,7 +15,6 @@ const usersRouter = require("./routers/users");
 const messagesRouter = require("./routers/messages");
 const { addUser } = require("./models/user");
 const { addMessage } = require("./models/messages");
-const client = require("./twilio/config");
 const { Message } = require("./models/schema");
 
 app.use(cors());
@@ -73,13 +72,19 @@ app.post("/messages/receive-update", async (req, res, next) => {
   try {
     const { MessageSid: sid, To: to, MessageStatus: message_status } = req.body;
 
+    console.log(req.body);
+
     await Message.updateOne({ sid }, { message_status });
+
+    console.log("pre - emit");
 
     io.emit("message-update", {
       sid,
       to,
       message_status,
     });
+
+    console.log(`should have updated to ${message_status}`);
   } catch (err) {
     next(err);
   }
