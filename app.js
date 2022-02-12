@@ -14,6 +14,7 @@ const messagesRouter = require("./routers/messages");
 const usersRouter = require("./routers/users");
 
 const { twilioError, serverError } = require("./errors/errors");
+const { endpoints } = require("./endpoints");
 
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res, next) => {
-  res.send("Server Running");
+  res.send(endpoints);
 });
 
 app.use("/users", usersRouter);
