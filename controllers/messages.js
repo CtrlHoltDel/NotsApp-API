@@ -1,38 +1,43 @@
-const { addMessage } = require("../models/messages");
-const { Message } = require("../models/schema");
-const client = require("../twilio/config");
+const {
+  addMessage,
+  fetchMessages,
+  receiveMessageHook,
+  receiveUpdateHook,
+} = require("../models/messages");
 
 exports.sendMessage = async (req, res, next) => {
   try {
-    const { message, number } = req.body;
-
-    const data = await client.messages.create({
-      body: message,
-      to: number,
-      from: "whatsapp:+14155238886",
-    });
-
-    const timeStamp = Date.now();
-    await addMessage({ ...data, timeStamp, message_status: "sending" });
-
-    res.status(201).send({ data, timeStamp, message_status: "sending" });
+    const data = await addMessage(req.body);
+    res.status(201).send(data);
   } catch (err) {
     next(err);
   }
 };
 
 exports.getMessages = async (req, res, next) => {
-  const { number } = req.query;
-
   try {
-    const messages = await Message.find({
-      $or: [{ from: `whatsapp:+${number}` }, { to: `whatsapp:+${number}` }],
-    })
-      .sort({ timeStamp: -1 })
-      .limit(40);
-
+    const messages = await fetchMessages(req.query);
     res.send({ messages });
   } catch (err) {
+    next(err);
+  }
+};
+
+exports.receiveMessage = async (req, res, next) => {
+  try {
+    await receiveMessageHook(req.body, req.io);
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.receiveUpdate = async (req, res, next) => {
+  try {
+    await receiveUpdateHook(req.body, req.io);
+    res.sendStatus(204);
+  } catch (err) {
+    console.log(err);
     next(err);
   }
 };

@@ -1,10 +1,7 @@
 const { User } = require("./schema");
 
 exports.addUser = async (number, profile_name, recent_message, timeStamp) => {
-  const userCheck = await User.findOne({ number });
-
-  if (userCheck) {
-    //If there's no media, preview media type instead.
+  if (await User.findOne({ number })) {
     await User.updateOne({ number }, { recent_message, timeStamp });
   } else {
     const userInstance = new User({
