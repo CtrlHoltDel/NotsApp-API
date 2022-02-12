@@ -10,19 +10,19 @@ Interacts with WhatsApp through the [Twilio WhatsApp API](https://www.twilio.com
 
 #### [Node](https://nodejs.org/en/)
 
-`The base of the project. Allows Javascript code to be ran on a server.`
+The base of the project. Allows Javascript code to be ran on a server.
 
 #### [Express](https://expressjs.com/)
 
-`Builds upon and simplifies some of Nodes web server functionality. Comes with features such as middleware and routing.`
+Builds upon and simplifies some of Nodes web server functionality. Comes with features such as middleware and routing.
 
 #### [Socket.io](https://socket.io/)
 
-`Used to create duplex connections between the API and a connected front end. >Allows for instant user feedback.`
+Used to create duplex connections between the API and a connected front end. >Allows for instant user feedback.
 
 #### [MongoDB](https://www.mongodb.com/)
 
-`A non-relational database. Hosted in the cloud at [MongoDB Atlas](https://www.mongodb.com/atlas) and interacted with using [mongoose](https://mongoosejs.com/).`
+A non-relational database. Hosted in the cloud at [MongoDB Atlas](https://www.mongodb.com/atlas) and interacted with using [mongoose](https://mongoosejs.com/).
 
 ### Setup
 
