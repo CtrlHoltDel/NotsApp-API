@@ -14,7 +14,6 @@ const messagesRouter = require("./routers/messages");
 const usersRouter = require("./routers/users");
 
 const { twilioError, serverError } = require("./errors/errors");
-const res = require("express/lib/response");
 
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 
